@@ -39,7 +39,7 @@ npm install
 # start backend development server
 npm run dev
 
-cd ../frontend
+cd ../Frontend
 
 # Install dependencies
 npm install
