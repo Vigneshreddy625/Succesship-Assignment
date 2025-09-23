@@ -20,12 +20,14 @@ export const verifyJWT = async (req, res, next) => {
     );
 
     if (!user) {
-      throw new ApiError(401, 'Invalid Access Token');
+      req.user = null;
+      return next();
     }
 
     req.user = user;
     next();
   } catch (error) {
+    console.error('JWT verification error:', error.message);
     req.user = null;
     return next();
   }

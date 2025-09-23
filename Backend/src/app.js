@@ -1,14 +1,21 @@
 import express from "express"
 import cookieParser from "cookie-parser"
 import cors from "cors"
-
+import configurePassport from './config/passport.js'
 import dotenv from "dotenv"
+import passport from "passport";
+import helmet from "helmet"
+import sheetsRoutes from './routes/sheets.routes.js'
+import authRoutes from './routes/auth.routes.js'
+import formRoutes from './routes/form.routes.js'
 
-dotenv.config('./.env')
+dotenv.config({ path: './.env' });
 
-const app = express()
+const app = express();
+app.set('trust proxy', true);
+app.use(passport.initialize());
 
-app.set('trust proxy', true)
+configurePassport();
 
 const allowedOrigins = [
   "http://localhost:5173",
@@ -19,11 +26,16 @@ app.use(cors({
   origin: allowedOrigins,
   credentials: true,
 }))
-
 app.use(express.json({limit: '16kb'}))
 app.use(express.urlencoded({extended: true}))
 app.use(express.static('public'))
 app.use(cookieParser())
+
+// routes
+app.use('/api/auth', authRoutes)
+app.use('/api/sheets', sheetsRoutes)
+app.use('/api/forms', formRoutes)
+
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
@@ -34,9 +46,5 @@ app.use((err, req, res, next) => {
     message,
   });
 });
-
-import userRouter from "./routes/users.routes.js"
-
-app.use("/api/v1/users", userRouter);
 
 export { app }
